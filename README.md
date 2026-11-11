@@ -1,7 +1,6 @@
 # MaxSAT – die Kerngröße geht mit den Unterschieden einher – Streamlit-Demo
 
-<!-- TODO nach dem Deploy: direkt hierher den Live-Link setzen (Leerzeile davor und danach):
-**[→ Demo live ausprobieren](https://sebastianhanisch-maxsat-demo.streamlit.app/)** -->
+**[→ Demo live ausprobieren](https://sebastianhanisch-maxsat-demo.streamlit.app/)**
 
 Demo der Linie **SAT und Constraint Programming** in der „Konzepte“-Reihe für die Website „Sebastian Hanisch – Operations Research und Machine Learning“. Sie wechselt von der Frage „Ist die Formel erfüllbar?“ zur Frage „**Wie viele weiche Klauseln müssen fallen?**“ (MaxSAT) und nutzt dafür die Bausteine des SAT-Arms der Linie: den CDCL-Löser mit Annahmen, der bei „unerfüllbar“ einen **Kern** nennt (eine Teilmenge der Annahmen, die den Widerspruch erklärt), und den Zähler aus der Kardinalitäts-Kodierung. Die Demo zeigt an einem Beispiel mit sechs weichen Klauseln von Hand, wie Kerne die untere Schranke heben, und vergleicht **lineare Suche, Fu–Malik und OLL** in Konflikten (nie in Sekunden) auf Aufträgen mit Unverträglichkeiten: Kontrollpunkte (Vertex Cover), Rampen (3-Färbung mit möglichst wenigen Konflikten) und einer überbestimmten Zufallsformel.
 
