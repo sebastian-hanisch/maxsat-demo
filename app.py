@@ -14,6 +14,7 @@ import streamlit as st
 import mxs_algorithm as A
 import mxs_constants as C
 import mxs_evaluation as E
+import mxs_live as L
 import mxs_scenario as S
 import mxs_visualization as V
 from mxs_layout import dunkles_design, kopf_css
@@ -38,16 +39,6 @@ def _hand(gewichte, kern_wahl):
 @st.cache_data(show_spinner=False)
 def _instanz(art, n, seed, hi):
     return S.erzeuge(art, n, seed, hi)
-
-
-@st.cache_data(show_spinner=False)
-def _live_instanz(art, n, seed, hi, verfahren, budget):
-    return E.live_messung(S.erzeuge(art, n, seed, hi), verfahren, budget)
-
-
-@st.cache_data(show_spinner=False)
-def _live_serie(art, n, hi, verfahren, budget):
-    return E.live_serie(art, n, hi, verfahren, budget)
 
 
 def _sec(n):
@@ -197,9 +188,8 @@ with st.expander("🔁 Live rechnen (eine Instanz oder zehn)", expanded=False):
     signatur = (art, n, seed, hi, tuple(gewaehlt), budget)
     b1, b2 = st.columns(2)
     if b1.button("Diese Instanz live lösen", key="live_go", disabled=zu_gross or not gewaehlt,
-                 help="Die gewählten Verfahren auf der Instanz der Seitenleiste; je nach Familie, Größe und Verfahren einige Sekunden bis mehrere Minuten."):
-        with st.spinner("Die Instanz wird gelöst (je nach Familie und Größe einige Sekunden bis mehrere Minuten) …"):
-            st.session_state["live_e2"] = {"sig": signatur, "laeufe": _live_instanz(art, n, seed, hi, tuple(gewaehlt), budget)}
+                 help="Die gewählten Verfahren auf der Instanz der Seitenleiste; ein Fortschrittsbalken zählt die fertigen Verfahren, ein zweiter Klick mit denselben Einstellungen antwortet aus dem Zwischenspeicher."):
+        st.session_state["live_e2"] = {"sig": signatur, "laeufe": L.instanz(art, n, seed, hi, tuple(gewaehlt), budget)}
     g = st.session_state.get("live_e2")
     if g and g["sig"] == signatur:
         laeufe = g["laeufe"]
@@ -213,9 +203,8 @@ with st.expander("🔁 Live rechnen (eine Instanz oder zehn)", expanded=False):
         st.caption("Die Einstellungen haben sich geändert: erneut starten.")
     signatur_serie = (art, n, hi, tuple(gewaehlt), budget)
     if b2.button("Messreihe live starten (10 Instanzen)", key="live_serie_go", disabled=zu_gross or not gewaehlt,
-                 help="Zehn feste Instanzen (Zufalls-Seeds 100 bis 109) mit den gewählten Verfahren; dauert je nach Familie und Größe Minuten."):
-        with st.spinner("Die Messreihe läuft (zehn Instanzen; je nach Familie und Größe einige Minuten) …"):
-            st.session_state["live_serie"] = {"sig": signatur_serie, "zelle": _live_serie(art, n, hi, tuple(gewaehlt), budget)}
+                 help="Zehn feste Instanzen (Zufalls-Seeds 100 bis 109) mit den gewählten Verfahren; ein Fortschrittsbalken zählt die fertigen Läufe, ein zweiter Klick mit denselben Einstellungen antwortet aus dem Zwischenspeicher."):
+        st.session_state["live_serie"] = {"sig": signatur_serie, "zelle": L.serie(art, n, hi, tuple(gewaehlt), budget)}
     gs = st.session_state.get("live_serie")
     if gs and gs["sig"] == signatur_serie:
         zl = gs["zelle"]
@@ -276,8 +265,7 @@ with st.expander("🔁 Live: OLL mit und ohne Stratifizierung auf der Instanz de
         st.info(f"Live gerechnet wird in dieser Familie nur bis n = {live_max}.")
     sig3 = (art, n, seed, hi, budget)
     if st.button("OLL und OLL + Stratifizierung live starten", key="live3_go", disabled=zu_gross or hi == 1):
-        with st.spinner("Beide Verfahren laufen (je nach Familie und Größe einige Sekunden bis mehrere Minuten) …"):
-            st.session_state["live_e3"] = {"sig": sig3, "laeufe": _live_instanz(art, n, seed, hi, ("oll", "oll_strat"), budget)}
+        st.session_state["live_e3"] = {"sig": sig3, "laeufe": L.instanz(art, n, seed, hi, ("oll", "oll_strat"), budget)}
     g3 = st.session_state.get("live_e3")
     if g3 and g3["sig"] == sig3:
         kind, text = E.verdict_live(g3["laeufe"], budget)
@@ -310,8 +298,7 @@ with st.expander("🔁 Live: OLL mit und ohne Kernminimierung auf der Instanz de
     sig4 = (art, n, seed, hi, budget)
     verf4 = ("oll_strat", "oll_strat_min") if hi > 1 else ("oll", "oll_min")
     if st.button("Mit und ohne Kernminimierung live starten", key="live4_go", disabled=zu_gross):
-        with st.spinner("Beide Läufe laufen (je nach Familie und Größe einige Sekunden bis mehrere Minuten) …"):
-            st.session_state["live_e4"] = {"sig": sig4, "laeufe": _live_instanz(art, n, seed, hi, verf4, budget)}
+        st.session_state["live_e4"] = {"sig": sig4, "laeufe": L.instanz(art, n, seed, hi, verf4, budget)}
     g4 = st.session_state.get("live_e4")
     if g4 and g4["sig"] == sig4:
         kind, text = E.verdict_live(g4["laeufe"], budget)

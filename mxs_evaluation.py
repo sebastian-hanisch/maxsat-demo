@@ -242,16 +242,26 @@ def live_messung(inst, verfahren, budget: int, fortschritt=None) -> dict:
     return out
 
 
-def live_serie(art: str, n: int, hi: int, verfahren, budget: int, seeds=C.SEEDS) -> dict:
-    """Zehn feste Instanzen live, in der Form einer vorgerechneten Zelle (für dieselben Tabellen)."""
+def live_lauf(art: str, n: int, seed: int, hi: int, verfahren: str, budget: int):
+    """Eine Einheit der Live-Läufe: ein Verfahren auf einer Instanz (dieselbe Rechnung wie in `live_messung`)."""
+    return A.laufe(S.erzeuge(art, n, seed, hi), verfahren, call_budget=min(C.CALL_BUDGET_MAX, budget), total_budget=budget, kern_wahl="loeser")
+
+
+def live_serie_aufbauen(art: str, n: int, hi: int, verfahren, budget: int, lauf, seeds=C.SEEDS) -> dict:
+    """Setzt die Zelle aus den Einheiten zusammen; `lauf(art, n, seed, hi, verfahren, budget)` liefert einen Lauf (gerechnet oder aus dem Zwischenspeicher)."""
     z = {"art": art, "n": n, "gewichtet": hi > 1, "instanzen": []}
     for s in seeds:
         inst = S.erzeuge(art, n, s, hi)
         z["instanzen"].append({"seed": s, "weich": len(inst.weich), "gewichtssumme": sum(inst.gewichte), "laeufe": {
             v: {"optimum": l.optimum, "status": l.status, "aufrufe": l.aufrufe, "konflikte": l.konflikte, "untere": l.untere, "kerne": l.kerngroessen,
                 "kerne_vor": [k.vor_minimierung for k in l.kerne], "klauseln": l.klauseln, "hilfsvariablen": l.hilfsvariablen, "kosten_modell": l.kosten_modell}
-            for v, l in live_messung(inst, verfahren, budget).items()}})
+            for v, l in ((v, lauf(art, n, s, hi, v, budget)) for v in verfahren)}})
     return z
+
+
+def live_serie(art: str, n: int, hi: int, verfahren, budget: int, seeds=C.SEEDS) -> dict:
+    """Zehn feste Instanzen live, in der Form einer vorgerechneten Zelle (für dieselben Tabellen)."""
+    return live_serie_aufbauen(art, n, hi, verfahren, budget, live_lauf, seeds)
 
 
 # ------------------------------------------------------------------------------------------------------------------------------ Texte für Experiment 1

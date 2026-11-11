@@ -108,6 +108,7 @@ Die Zählung je Instanz steht neben jedem Verhältnis der Mediane, weil der Medi
 | `mxs_constants.py` | Regler-Grenzen, Messraster, Schwellen, Farben, Presets |
 | `mxs_evaluation.py` | Kennzahlen, Verdikte, Tabellen, Live-Messung |
 | `mxs_layout.py` | Fester Kopf (Stylesheet) |
+| `mxs_live.py` | Live-Knöpfe: Zwischenspeicher (`st.cache_data`, je Einheit) und Fortschrittsanzeige (zählt die fertigen Einheiten) |
 | `mxs_messungen.json`, `mxs_cpsat.json` | vorgerechnete Messreihen, eingefrorener CP-SAT-Maßstab |
 | `mxs_presets.py` | Permalink (Einrasten), Presets (Schnellstart in der Seitenleiste), Zufalls-Seed-Button |
 | `mxs_scenario.py` | Handbeispiel, Instanzerzeuger, Gewichte, Kosten |
@@ -133,7 +134,7 @@ streamlit run app.py
 
 ```bash
 pip install -r requirements-dev.txt
-pytest tests/ -v    # 167 Tests
+pytest tests/ -v    # 171 Tests
 ```
 
 Die vorgerechneten Messreihen neu schreiben: `python tools/messungen.py --zelle rampen|40|u --out teil.json` je Zelle (Liste mit `--liste`), danach `python tools/messungen.py --zusammen teil_*.json`; den Maßstab entsprechend mit `tools/cpsat_messung.py`. Das dauert wegen des Python-CDCL mehrere Stunden.
